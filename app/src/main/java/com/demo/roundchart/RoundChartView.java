@@ -25,8 +25,8 @@ public class RoundChartView extends View {
 
     private int height;
     private int width;
-
     private int roundRadius;//圆饼半径
+
     private int[] arcColor = { Color.rgb(202,113,153)
             , Color.parseColor("#E15A4F"), Color.parseColor("#1C8CEC")
             , Color.parseColor("#FFCE43"), Color.parseColor("#CE00FB")};
@@ -75,10 +75,10 @@ public class RoundChartView extends View {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         height = MeasureSpec.getSize(heightMeasureSpec);
         width = MeasureSpec.getSize(widthMeasureSpec);
-        if (height > width) {
-            roundRadius = width / 3;
-        } else {
-            roundRadius = height / 3;
+        if (height == 0||width == 0) {
+            roundRadius = 0;
+        		}else {
+            roundRadius = Math.min(height,width)/3;
         }
     }
 
@@ -86,8 +86,9 @@ public class RoundChartView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         this.width = getWidth();
-        if (arcColor != null && textStr != null && percentage != null
-                && arcColor.length == textStr.length && textStr.length == percentage.length) {
+        if (roundRadius != 0&&arcColor != null && textStr != null && percentage != null
+                && arcColor.length == textStr.length
+                && textStr.length == percentage.length) {
             canvas.drawCircle(width / 2, height / 2, roundRadius, shadePaint);//画圆饼的外圈颜色
             setArc(canvas);//绘制每个盘快
         }
@@ -127,7 +128,7 @@ public class RoundChartView extends View {
      */
     private void drawText(Canvas canvas, String str, RectF rect, int startAngle, int angle, Double percentage) {
         Path path = new Path();//绘制每个盘快文字的路径
-        path.addArc(rect, startAngle, angle);
+        path.addArc(rect, startAngle, angle);//设置路径的位置以及长度
         textPaint.setTextSize(25);//设置每个盘快字体的大小为每个弧度大小的十分之一
         int textLe = (int) textPaint.measureText(str);//文字的长度
         int hOffset = (int) (((roundRadius * 2) * Math.PI) * percentage - textLe) / 2;//水平偏移长度
@@ -137,12 +138,12 @@ public class RoundChartView extends View {
     }
 
     /**
-     * 绘制中心的圆
+     * 绘制中心的圆和中心圆的文字
      */
     private void drawCenterRound(Canvas canvas) {
         int centerRoundRadius = roundRadius / 3;//中心圆的半径
-        centerTextPaint.setTextSize(centerRoundRadius / 3);//设置中心字体的大小，为中心小圆的4分之一
-        centerBelowTextPaint.setTextSize(centerRoundRadius / 4);//设置中心字体的大小，为中心小圆的5分之一
+        centerTextPaint.setTextSize(centerRoundRadius / 3);//设置中心字体的大小，为中心小圆的3分之一
+        centerBelowTextPaint.setTextSize(centerRoundRadius / 4);//设置中心字体的大小，为中心小圆的4分之一
         int centerTextWidth = (int) centerTextPaint.measureText("总和");
         int centerBlowTextWidth = (int) centerBelowTextPaint.measureText("520");
         canvas.drawCircle(width / 2, height / 2, centerRoundRadius, centerPaint);
